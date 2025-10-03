@@ -787,6 +787,12 @@ class ApiKeyService {
     accountId = null
   ) {
     try {
+      // 检查是否启用统计功能
+      const config = require('../../config/config')
+      if (config.statistics && config.statistics.enabled === false) {
+        logger.debug('📊 Usage statistics disabled, skipping recordUsage')
+        return
+      }
       const totalTokens = inputTokens + outputTokens + cacheCreateTokens + cacheReadTokens
 
       // 计算费用
@@ -929,6 +935,12 @@ class ApiKeyService {
     accountType = null
   ) {
     try {
+      // 检查是否启用统计功能
+      const config = require('../../config/config')
+      if (config.statistics && config.statistics.enabled === false) {
+        logger.debug('📊 Usage statistics disabled, skipping recordUsageWithDetails')
+        return
+      }
       // 提取 token 数量
       const inputTokens = usageObject.input_tokens || 0
       const outputTokens = usageObject.output_tokens || 0

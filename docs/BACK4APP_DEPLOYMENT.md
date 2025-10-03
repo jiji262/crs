@@ -1,6 +1,8 @@
-# Claude Relay Service - Back4app + Upstash 部署指南
+# Claude Relay Service - Back4app + Redis 部署指南
 
-本指南详细说明如何使用 Back4app Containers（免费，**不需要信用卡**）和 Upstash Redis（免费）部署 Claude Relay Service。
+本指南详细说明如何使用 Back4app Containers（免费，**不需要信用卡**）和免费 Redis 部署 Claude Relay Service。
+
+> **💡 Redis 选择建议**：推荐使用 **Aiven for Valkey**（1GB 内存，无请求限制），比 Upstash 更适合长期使用。详见 [Aiven 迁移指南](./AIVEN_MIGRATION.md)。
 
 ## 📑 目录
 
@@ -39,7 +41,9 @@
 
 **前置要求**：
 - Back4app 账号（免费注册，不需要信用卡）
-- Upstash 账号（免费注册，不需要信用卡）
+- Redis 数据库（选择一个）：
+  - **推荐：Aiven for Valkey**（1GB 内存，无请求限制，永久免费）
+  - 或：Upstash Redis（250MB 内存，50万次/天请求限制）
 - GitHub 账号（代码托管）
 - **如需长期使用：准备升级到付费套餐或使用其他平台**
 
@@ -55,11 +59,20 @@
 - 可使用 GitHub/Google 账号快速登录
 - ✅ **免费计划无需信用卡**
 
-**Upstash Redis 账号**
+**Redis 数据库（二选一）**
+
+**方案 1：Aiven for Valkey（推荐）⭐**
+- 访问：https://aiven.io/
+- 点击 "Start free" 注册账号
+- 免费计划：**1GB 内存，5GB 存储，无请求限制**
+- **优势**：4倍内存，无请求次数限制，独立虚拟机
+- 详细教程：查看 [Aiven 迁移指南](./AIVEN_MIGRATION.md)
+
+**方案 2：Upstash Redis**
 - 访问：https://upstash.com/
 - 点击 "Sign Up" 注册账号
-- 可使用 GitHub/Google 账号快速登录
-- 免费计划包含：500K 命令/月，256MB 存储
+- 免费计划：250MB 内存，50万次/天请求
+- **限制**：请求配额易超限（约 5.8 次/秒）
 
 **GitHub 账号**
 - 访问：https://github.com/

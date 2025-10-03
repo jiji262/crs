@@ -4,6 +4,7 @@
  */
 
 const logger = require('../utils/logger')
+const config = require('../../config/config')
 const openaiAccountService = require('./openaiAccountService')
 const claudeAccountService = require('./claudeAccountService')
 const claudeConsoleAccountService = require('./claudeConsoleAccountService')
@@ -14,8 +15,9 @@ class RateLimitCleanupService {
   constructor() {
     this.cleanupInterval = null
     this.isRunning = false
-    // 默认每5分钟检查一次
-    this.intervalMs = 5 * 60 * 1000
+    // 从配置读取间隔，默认5分钟
+    const intervalMinutes = config.scheduledTasks?.rateLimitCleanupInterval || 5
+    this.intervalMs = intervalMinutes * 60 * 1000
     // 存储已清理的账户信息，用于发送恢复通知
     this.clearedAccounts = []
   }

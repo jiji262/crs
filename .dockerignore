@@ -14,7 +14,10 @@ logs/
 
 # Data files
 data/
+!data/.gitkeep
 temp/
+# But include resources directory with fallback pricing data
+!resources/
 
 # Git
 .git/

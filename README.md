@@ -21,11 +21,10 @@
 
 <div align="center">
 
-| 平台 | 类型 | 服务 | 介绍 |
-|:---|:---|:---|:---|
+| 平台                              | 类型            | 服务                                          | 介绍                                                  |
+| :-------------------------------- | :-------------- | :-------------------------------------------- | :---------------------------------------------------- |
 | **[pincc.ai](https://pincc.ai/)** | 🏆 **官方运营** | <small>✅ Claude Code<br>✅ Codex CLI</small> | 项目直营，提供稳定的 Claude Code / Codex CLI 拼车服务 |
-| **[ctok.ai](https://ctok.ai/)** | 🤝 合作伙伴 | <small>✅ Claude Code<br>✅ Codex CLI</small> | 社区认证，提供 Claude Code / Codex CLI 拼车 |
-
+| **[ctok.ai](https://ctok.ai/)**   | 🤝 合作伙伴     | <small>✅ Claude Code<br>✅ Codex CLI</small> | 社区认证，提供 Claude Code / Codex CLI 拼车           |
 
 </div>
 
@@ -38,7 +37,6 @@
 🚨 **服务条款风险**: 使用本项目可能违反Anthropic的服务条款。请在使用前仔细阅读Anthropic的用户协议，使用本项目的一切风险由用户自行承担。
 
 📖 **免责声明**: 本项目仅供技术学习和研究使用，作者不对因使用本项目导致的账户封禁、服务中断或其他损失承担任何责任。
-
 
 ## 🤔 这个项目适合你吗？
 
@@ -108,7 +106,7 @@
 ### 软件要求
 
 - **Node.js** 18或更高版本
-- **Redis** 6或更高版本
+- **Redis** 6或更高版本（推荐使用 **Aiven for Valkey** 免费版）
 - **操作系统**: 建议Linux
 
 ### 费用估算
@@ -231,10 +229,17 @@ cp .env.example .env
 JWT_SECRET=你的超级秘密密钥
 ENCRYPTION_KEY=32位的加密密钥随便写
 
-# Redis配置
+# Redis 配置
+# 本地 Redis
 REDIS_HOST=localhost
 REDIS_PORT=6379
 REDIS_PASSWORD=
+
+# 或使用 Aiven for Valkey（推荐）
+# REDIS_HOST=your-service.aivencloud.com
+# REDIS_PORT=12345
+# REDIS_PASSWORD=your-aiven-password
+# REDIS_ENABLE_TLS=true
 
 ```
 
@@ -284,14 +289,27 @@ npm run service:status
 
 ## 🐳 Docker 部署
 
+> 📚 **详细部署文档**:
+>
+> - [Render + Redis 云部署](docs/RENDER_UPSTASH_DEPLOYMENT.md) - 免费/低成本云部署方案（⭐ 推荐 Aiven）
+> - [VPS Docker 部署](docs/VPS_DOCKER_DEPLOYMENT.md) - 自有服务器部署方案
+> - [Aiven 迁移指南](docs/AIVEN_MIGRATION.md) - ⭐ **推荐使用 Aiven for Valkey**（1GB 内存，无请求限制）
+> - [Upstash 配额优化](docs/UPSTASH_QUOTA_FIX.md) - Upstash 用户必读（有请求限制）
+
+> 💡 **Redis 选择建议**：
+> - **Aiven for Valkey**（推荐）: 1GB 内存，无请求限制，永久免费，独立虚拟机
+> - Upstash Redis: 250MB 内存，50万次/天请求，免费但易超配额
+
 ### Docker compose
 
 #### 第一步：下载构建docker-compose.yml文件的脚本并执行
+
 ```bash
 curl -fsSL https://pincc.ai/crs-compose.sh -o crs-compose.sh && chmod +x crs-compose.sh && ./crs-compose.sh
 ```
 
 #### 第二步：启动
+
 ```bash
 docker-compose up -d
 ```
@@ -400,7 +418,7 @@ export ANTHROPIC_AUTH_TOKEN="后台创建的API密钥"
 
 ```json
 {
-    "primaryApiKey": "crs"
+  "primaryApiKey": "crs"
 }
 ```
 
@@ -449,7 +467,7 @@ env_key = "CRS_OAI_KEY"
 
 ```json
 {
-    "OPENAI_API_KEY": null  
+  "OPENAI_API_KEY": null
 }
 ```
 
@@ -481,9 +499,10 @@ claude-opus-4-20250514     # Claude Opus 4
 ```
 
 配置步骤：
+
 - 供应商类型选择"Anthropic"
 - API地址填入：`http://你的服务器:3000/claude/`
-- API Key填入：后台创建的API密钥（cr_开头）
+- API Key填入：后台创建的API密钥（cr\_开头）
 
 **2. Gemini账号接入：**
 
@@ -496,9 +515,10 @@ gemini-2.5-pro             # Gemini 2.5 Pro
 ```
 
 配置步骤：
+
 - 供应商类型选择"Gemini"
 - API地址填入：`http://你的服务器:3000/gemini/`
-- API Key填入：后台创建的API密钥（cr_开头）
+- API Key填入：后台创建的API密钥（cr\_开头）
 
 **3. Codex接入：**
 
@@ -511,9 +531,10 @@ gpt-5                      # Codex使用固定模型ID
 ```
 
 配置步骤：
+
 - 供应商类型选择"Openai-Response"
 - API地址填入：`http://你的服务器:3000/openai/`
-- API Key填入：后台创建的API密钥（cr_开头）
+- API Key填入：后台创建的API密钥（cr\_开头）
 - **重要**：Codex只支持Openai-Response标准
 
 #### 其他第三方工具接入
@@ -523,7 +544,7 @@ gpt-5                      # Codex使用固定模型ID
 - 所有账号类型都使用相同的API密钥（在后台统一创建）
 - 根据不同的路由前缀自动识别账号类型
 - `/claude/` - 使用Claude账号池
-- `/gemini/` - 使用Gemini账号池  
+- `/gemini/` - 使用Gemini账号池
 - `/openai/` - 使用Codex账号（只支持Openai-Response格式）
 - 支持所有标准API端点（messages、models等）
 
@@ -616,7 +637,6 @@ npm run service:status
    - 系统会在日志中记录所有请求的User-Agent
    - 客户端验证失败时会返回403错误并记录详细信息
    - 通过日志可以查看实际的User-Agent格式，方便配置自定义客户端
-
 
 ### 日志示例
 

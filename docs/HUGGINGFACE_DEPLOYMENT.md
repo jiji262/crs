@@ -1,6 +1,8 @@
-# Claude Relay Service - Hugging Face Spaces + Upstash 部署指南
+# Claude Relay Service - Hugging Face Spaces + Redis 部署指南
 
-本指南详细说明如何使用 Hugging Face Spaces（Docker SDK，免费，**不需要信用卡**）和 Upstash Redis（免费）部署 Claude Relay Service。
+本指南详细说明如何使用 Hugging Face Spaces（Docker SDK，免费，**不需要信用卡**）和免费 Redis 部署 Claude Relay Service。
+
+> **💡 Redis 选择建议**：推荐使用 **Aiven for Valkey**（1GB 内存，无请求限制），比 Upstash 更适合长期使用。详见 [Aiven 迁移指南](./AIVEN_MIGRATION.md)。
 
 ## 📑 目录
 
@@ -35,7 +37,9 @@
 
 **前置要求**：
 - Hugging Face 账号（免费注册，不需要信用卡）
-- Upstash 账号（免费注册，不需要信用卡）
+- Redis 数据库（选择一个）：
+  - **推荐：Aiven for Valkey**（1GB 内存，无请求限制，永久免费）
+  - 或：Upstash Redis（250MB 内存，50万次/天请求限制）
 - 基础的 Git 使用知识（或使用 Web 界面）
 
 **重要说明**：

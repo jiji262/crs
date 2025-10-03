@@ -1,6 +1,8 @@
-# Claude Relay Service - Render + Upstash Docker 部署指南
+# Claude Relay Service - Render + Redis 部署指南
 
-本指南详细说明如何使用 Docker + Render.com（免费/付费Web服务）和 Upstash Redis（免费层）部署 Claude Relay Service。
+本指南详细说明如何使用 Docker + Render.com（免费/付费Web服务）和免费 Redis 部署 Claude Relay Service。
+
+> **💡 Redis 选择建议**：推荐使用 **Aiven for Valkey**（1GB 内存，无请求限制），比 Upstash 更适合长期使用。详见 [Aiven 迁移指南](./AIVEN_MIGRATION.md)。
 
 ## 📑 目录
 
@@ -33,7 +35,9 @@
 **前置要求**：
 
 - Render 账号（免费注册）
-- Upstash 账号（免费注册）
+- Redis 数据库（选择一个）：
+  - **推荐：Aiven for Valkey**（1GB 内存，无请求限制，永久免费）
+  - 或：Upstash Redis（250MB 内存，50万次/天请求限制）
 
 **核心优势**：
 
@@ -56,12 +60,20 @@
 - 可使用 GitHub/GitLab 账号快速登录
 - 免费计划包含：750小时/月的免费服务时间
 
-**Upstash Redis 账号**
+**Redis 数据库（二选一）**
 
+**方案 1：Aiven for Valkey（推荐）⭐**
+- 访问：https://aiven.io/
+- 点击 "Start free" 注册账号
+- 免费计划：**1GB 内存，5GB 存储，无请求限制**
+- **优势**：4倍内存，无请求次数限制，独立虚拟机
+- 详细教程：查看 [Aiven 迁移指南](./AIVEN_MIGRATION.md)
+
+**方案 2：Upstash Redis**
 - 访问：https://upstash.com/
 - 点击 "Sign Up" 注册账号
-- 可使用 GitHub/Google 账号快速登录
-- 免费计划包含：10,000条命令/天，256MB存储
+- 免费计划：250MB 内存，50万次/天请求
+- **限制**：请求配额易超限（约 5.8 次/秒）
 
 **GitHub 账号**（用于代码托管）
 
@@ -72,54 +84,77 @@
 
 **免费方案组合**
 
-- Render Free Plan：$0/月（有限制：服务15分钟无活动会休眠，重启需30-60秒）
-- Upstash Free Plan：$0/月（10K命令/天，对小团队足够）
+**推荐方案（Aiven）**
+- Render Free Plan：$0/月
+- **Aiven for Valkey**：$0/月（1GB 内存，无请求限制）⭐
 - **总计：$0/月**
+
+**备选方案（Upstash）**
+- Render Free Plan：$0/月
+- Upstash Redis：$0/月（250MB 内存，50万次/天）
+- **总计：$0/月**
+- ⚠️ **注意**：Upstash 请求限制较低，易超配额
 
 **推荐付费方案**（生产环境）
 
-- Render Starter Plan：$7/月（无休眠，更快速度，更多资源）
-- Upstash Pay-as-you-go：$0.2/100K命令（按需付费）
-- **总计：约$7-10/月**
+- Render Starter Plan：$7/月（无休眠，更快速度）
+- Aiven Startup：$35/月（4GB 内存，高性能）或继续使用免费版
+- **总计：$7-42/月**
 
 ---
 
 ## 🐳 Docker 部署步骤
 
-### 第一步：创建 Upstash Redis 数据库
+### 第一步：创建 Redis 数据库
 
-#### 1.1 登录 Upstash 控制台
+#### 选择 Redis 提供商
 
-1. 访问：https://console.upstash.com/
-2. 使用你的账号登录
+**方案 A：Aiven for Valkey（推荐）⭐**
 
-#### 1.2 创建 Redis 数据库
+1. **注册并创建服务**
+   - 访问：https://console.aiven.io/
+   - 点击 "Create service" → 选择 "Valkey"
+   - 选择区域（推荐：与 Render 同区域）
+   - 选择 **"Free"** 套餐（1GB 内存）
+   - 等待 2-3 分钟，服务状态变为 "Running"
 
-1. 点击 "Create Database" 按钮
-2. 填写配置信息：
-   - **Name**: `claude-relay-redis`（或其他你喜欢的名称）
-   - **Type**: 选择 `Regional`（区域性数据库，免费）
-   - **Region**: 选择离你最近的区域（推荐 `us-east-1` 或 `ap-southeast-1`）
-   - **Eviction**: 选择 `noeviction`（不自动清除数据）
-   - **TLS**: 保持启用（默认）
+2. **获取连接信息**
+   ```
+   📋 在服务详情页复制：
 
-3. 点击 "Create" 创建数据库
+   Host: your-service.aivencloud.com
+   Port: 12345（Aiven 的自定义端口）
+   Password: your-aiven-password
+   ```
 
-#### 1.3 获取连接信息
+3. **详细步骤**：查看 [Aiven 迁移指南](./AIVEN_MIGRATION.md) 获取完整教程
 
-创建完成后，在数据库详情页面找到以下信息：
+---
 
-```
-📋 复制以下信息，稍后需要使用：
+**方案 B：Upstash Redis（备选）**
 
-Endpoint: redis-xxxxx.upstash.io
-Port: 6379 或 xxxxx（可能是自定义端口）
-Password: your-upstash-redis-password
-```
+1. **登录 Upstash 控制台**
+   - 访问：https://console.upstash.com/
+   - 使用你的账号登录
 
-**重要提示**：
+2. **创建 Redis 数据库**
+   - 点击 "Create Database" 按钮
+   - Name: `claude-relay-redis`
+   - Type: `Regional`（免费）
+   - Region: `us-east-1` 或 `ap-southeast-1`
+   - Eviction: `noeviction`
+   - TLS: 保持启用
 
-- Upstash 使用 TLS 加密连接（RedisS）
+3. **获取连接信息**
+   ```
+   📋 复制以下信息：
+
+   Endpoint: redis-xxxxx.upstash.io
+   Port: 6379
+   Password: your-upstash-password
+   ```
+
+⚠️ **Upstash 限制**：50万次/天请求限制，高流量场景易超配额
 - 记录完整的连接字符串，格式类似：`rediss://:password@endpoint:port`
 
 ---

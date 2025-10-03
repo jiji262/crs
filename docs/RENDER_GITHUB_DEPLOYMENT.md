@@ -2,6 +2,8 @@
 
 本指南详细说明如何使用 Render.com 的 GitHub 集成方式（而非 Docker）部署 Claude Relay Service。
 
+> **💡 Redis 选择建议**：推荐使用 **Aiven for Valkey**（1GB 内存，无请求限制），比 Upstash 更适合长期使用。详见 [Aiven 迁移指南](./AIVEN_MIGRATION.md)。
+
 ## 📑 目录
 
 - [🚀 快速开始](#-快速开始)
@@ -36,7 +38,9 @@
 
 **前置要求**：
 - Render 账号（免费注册）
-- Upstash 账号（免费注册）
+- Redis 数据库（选择一个）：
+  - **推荐：Aiven for Valkey**（1GB 内存，无请求限制，永久免费）
+  - 或：Upstash Redis（250MB 内存，50万次/天请求限制）
 - GitHub 账号（代码托管）
 - **需要绑定信用卡**（但免费计划不会扣费）
 

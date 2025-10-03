@@ -175,6 +175,23 @@ const config = {
     retries: parseInt(process.env.WEBHOOK_RETRIES) || 3 // 重试3次
   },
 
+  // 🔧 定时任务配置
+  scheduledTasks: {
+    // 限流清理间隔（分钟），默认5分钟
+    // 使用 Upstash 等免费 Redis 服务时建议设置为 30-60 分钟以节省配额
+    rateLimitCleanupInterval: parseInt(process.env.RATE_LIMIT_CLEANUP_INTERVAL) || 5,
+
+    // Token 刷新检查间隔（分钟），默认15分钟
+    tokenRefreshInterval: parseInt(process.env.TOKEN_REFRESH_INTERVAL) || 15
+  },
+
+  // 📊 使用统计配置
+  statistics: {
+    // 是否启用使用统计功能（token使用、费用计算、使用记录等）
+    // 禁用后可减少 97% 的 Redis 使用量，但会失去 Web 界面的统计图表功能
+    enabled: process.env.ENABLE_USAGE_STATISTICS !== 'false' // 默认启用，设置为 'false' 才禁用
+  },
+
   // 🛠️ 开发配置
   development: {
     debug: process.env.DEBUG === 'true',

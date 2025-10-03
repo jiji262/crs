@@ -548,7 +548,7 @@ class Application {
     // 🚨 启动限流状态自动清理服务
     // 每5分钟检查一次过期的限流状态，确保账号能及时恢复调度
     const rateLimitCleanupService = require('./services/rateLimitCleanupService')
-    const cleanupIntervalMinutes = config.system.rateLimitCleanupInterval || 5 // 默认5分钟
+    const cleanupIntervalMinutes = config.scheduledTasks?.rateLimitCleanupInterval || 5 // 默认5分钟
     rateLimitCleanupService.start(cleanupIntervalMinutes)
     logger.info(
       `🚨 Rate limit cleanup service started (checking every ${cleanupIntervalMinutes} minutes)`
