@@ -46,7 +46,7 @@ class RedisDiagnostics {
         console.warn(`⚠️  KEYS command detected: ${args[0]?.args?.join(' ')}`)
       }
 
-      return originalCommand(...args)
+      return originalSendCommand(...args)
     }
   }
 
@@ -139,9 +139,7 @@ class RedisDiagnostics {
     const requestsPerApi = afterCount - beforeCount
 
     console.log(`  Requests per API call: ${requestsPerApi}`)
-    console.log(
-      `  If 100 API calls/day: ${requestsPerApi * 100} requests/day`
-    )
+    console.log(`  If 100 API calls/day: ${requestsPerApi * 100} requests/day`)
     console.log()
   }
 
