@@ -491,24 +491,24 @@ Cherry Studio支持多种AI服务的接入，下面是不同账号类型的详�
 
 ```
 # API地址
-http://你的服务器:3000/claude/
+http://你的服务器:3000/claude
 
 # 模型ID示例
-claude-sonnet-4-20250514  # Claude Sonnet 4
+claude-sonnet-4-5-20250929 # Claude Sonnet 4.5
 claude-opus-4-20250514     # Claude Opus 4
 ```
 
 配置步骤：
 
 - 供应商类型选择"Anthropic"
-- API地址填入：`http://你的服务器:3000/claude/`
-- API Key填入：后台创建的API密钥（cr\_开头）
+- API地址填入：`http://你的服务器:3000/claude`
+- API Key填入：后台创建的API密钥（cr_开头）
 
 **2. Gemini账号接入：**
 
 ```
 # API地址
-http://你的服务器:3000/gemini/
+http://你的服务器:3000/gemini
 
 # 模型ID示例
 gemini-2.5-pro             # Gemini 2.5 Pro
@@ -517,14 +517,14 @@ gemini-2.5-pro             # Gemini 2.5 Pro
 配置步骤：
 
 - 供应商类型选择"Gemini"
-- API地址填入：`http://你的服务器:3000/gemini/`
-- API Key填入：后台创建的API密钥（cr\_开头）
+- API地址填入：`http://你的服务器:3000/gemini`
+- API Key填入：后台创建的API密钥（cr_开头）
 
 **3. Codex接入：**
 
 ```
 # API地址
-http://你的服务器:3000/openai/
+http://你的服务器:3000/openai
 
 # 模型ID（固定）
 gpt-5                      # Codex使用固定模型ID
@@ -533,9 +533,16 @@ gpt-5                      # Codex使用固定模型ID
 配置步骤：
 
 - 供应商类型选择"Openai-Response"
-- API地址填入：`http://你的服务器:3000/openai/`
-- API Key填入：后台创建的API密钥（cr\_开头）
+- API地址填入：`http://你的服务器:3000/openai`
+- API Key填入：后台创建的API密钥（cr_开头）
 - **重要**：Codex只支持Openai-Response标准
+
+**Cherry Studio 地址格式重要说明：**
+
+- ✅ **推荐格式**：`http://你的服务器:3000/claude`（不加结尾 `/`，让 Cherry Studio 自动加上 v1）
+- ✅ **等效格式**：`http://你的服务器:3000/claude/v1/`（手动指定 v1 并加结尾 `/`）
+- 💡 **说明**：这两种格式在 Cherry Studio 中是完全等效的
+- ❌ **错误格式**：`http://你的服务器:3000/claude/`（单独的 `/` 结尾会被 Cherry Studio 忽略 v1 版本）
 
 #### 其他第三方工具接入
 

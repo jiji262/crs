@@ -553,6 +553,21 @@ class Application {
     logger.info(
       `🚨 Rate limit cleanup service started (checking every ${cleanupIntervalMinutes} minutes)`
     )
+
+    // 🔄 启动 Token 主动刷新服务（可选）
+    // 如果启用，定期提前刷新即将过期的 OAuth token，保持所有账户 token 始终有效
+    if (config.scheduledTasks?.enableProactiveRefresh) {
+      const tokenRefreshScheduler = require('./services/tokenRefreshScheduler')
+      const refreshIntervalMinutes = config.scheduledTasks?.tokenRefreshInterval || 15
+      tokenRefreshScheduler.start(refreshIntervalMinutes)
+      logger.info(
+        `🔄 Token refresh scheduler started (interval: ${refreshIntervalMinutes} minutes, window: ${config.scheduledTasks?.tokenRefreshWindow || 5} minutes)`
+      )
+    } else {
+      logger.info(
+        '⏭️ Token refresh scheduler disabled (using lazy refresh only). Set ENABLE_PROACTIVE_TOKEN_REFRESH=true to enable.'
+      )
+    }
   }
 
   setupGracefulShutdown() {
@@ -578,6 +593,17 @@ class Application {
             logger.info('🚨 Rate limit cleanup service stopped')
           } catch (error) {
             logger.error('❌ Error stopping rate limit cleanup service:', error)
+          }
+
+          // 停止 Token 刷新服务
+          try {
+            if (config.scheduledTasks?.enableProactiveRefresh) {
+              const tokenRefreshScheduler = require('./services/tokenRefreshScheduler')
+              tokenRefreshScheduler.stop()
+              logger.info('🔄 Token refresh scheduler stopped')
+            }
+          } catch (error) {
+            logger.error('❌ Error stopping token refresh scheduler:', error)
           }
 
           try {

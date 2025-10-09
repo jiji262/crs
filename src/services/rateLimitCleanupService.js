@@ -112,9 +112,6 @@ class RateLimitCleanupService {
         )
       }
 
-      // 清空已清理账户列表
-      this.clearedAccounts = []
-
       // 记录错误
       const allErrors = [
         ...results.openai.errors,
@@ -127,6 +124,8 @@ class RateLimitCleanupService {
     } catch (error) {
       logger.error('❌ Rate limit cleanup failed:', error)
     } finally {
+      // 确保无论成功或失败都重置列表，避免重复通知
+      this.clearedAccounts = []
       this.isRunning = false
     }
   }
@@ -201,8 +200,12 @@ class RateLimitCleanupService {
             typeof account.rateLimitStatus === 'object' &&
             account.rateLimitStatus.status === 'limited')
 
+        const autoStopped = account.rateLimitAutoStopped === 'true'
+        const needsAutoStopRecovery =
+          autoStopped && (account.rateLimitEndAt || account.schedulable === 'false')
+
         // 检查所有可能处于限流状态的账号，包括自动停止的账号
-        if (isRateLimited || account.rateLimitedAt || account.rateLimitAutoStopped === 'true') {
+        if (isRateLimited || account.rateLimitedAt || needsAutoStopRecovery) {
           result.checked++
 
           try {
@@ -210,6 +213,9 @@ class RateLimitCleanupService {
             const isStillLimited = await claudeAccountService.isAccountRateLimited(account.id)
 
             if (!isStillLimited) {
+              if (!isRateLimited && autoStopped) {
+                await claudeAccountService.removeAccountRateLimit(account.id)
+              }
               result.cleared++
               logger.info(
                 `🧹 Auto-cleared expired rate limit for Claude account: ${account.name} (${account.id})`
@@ -288,10 +294,13 @@ class RateLimitCleanupService {
             typeof account.rateLimitStatus === 'object' &&
             account.rateLimitStatus.status === 'limited')
 
+        const autoStopped = account.rateLimitAutoStopped === 'true'
+        const needsAutoStopRecovery = autoStopped && account.schedulable === 'false'
+
         // 检查两种状态字段：rateLimitStatus 和 status
         const hasStatusRateLimited = account.status === 'rate_limited'
 
-        if (isRateLimited || hasStatusRateLimited) {
+        if (isRateLimited || hasStatusRateLimited || needsAutoStopRecovery) {
           result.checked++
 
           try {
@@ -301,6 +310,9 @@ class RateLimitCleanupService {
             )
 
             if (!isStillLimited) {
+              if (!isRateLimited && autoStopped) {
+                await claudeConsoleAccountService.removeAccountRateLimit(account.id)
+              }
               result.cleared++
 
               // 如果 status 字段是 rate_limited，需要额外清理

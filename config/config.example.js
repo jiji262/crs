@@ -182,7 +182,14 @@ const config = {
     rateLimitCleanupInterval: parseInt(process.env.RATE_LIMIT_CLEANUP_INTERVAL) || 5,
 
     // Token 刷新检查间隔（分钟），默认15分钟
-    tokenRefreshInterval: parseInt(process.env.TOKEN_REFRESH_INTERVAL) || 15
+    tokenRefreshInterval: parseInt(process.env.TOKEN_REFRESH_INTERVAL) || 15,
+
+    // Token 提前刷新窗口（分钟），默认5分钟
+    // Token 在过期前多久开始主动刷新（避免首次请求延迟）
+    tokenRefreshWindow: parseInt(process.env.TOKEN_REFRESH_WINDOW) || 5,
+
+    // 是否启用 Token 主动刷新（默认禁用，按需启用）
+    enableProactiveRefresh: process.env.ENABLE_PROACTIVE_TOKEN_REFRESH === 'true'
   },
 
   // 📊 使用统计配置
